@@ -10,6 +10,8 @@ function App() {
   const [rollnumber, setRollnumber] = useState(0);
   const [studentList, setStudentList] = useState([]);
   const [attendanceData, setAttendanceData] = useState({});
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     Axios.get('http://localhost:3031/read')
@@ -64,7 +66,10 @@ function App() {
   };
 
   const handleDownloadAttendance = () => {
-    Axios.get('http://localhost:3031/download', { responseType: 'blob' })
+    Axios.get('http://localhost:3031/download', {
+      params: { start: startDate, end: endDate },
+      responseType: 'blob',
+    })
       .then((response) => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
@@ -81,30 +86,65 @@ function App() {
 
   return (
     <div className="App">
-      <h1>BASIC ATTENDANCE MANAGEMENT APPLICATION</h1>
+    <h1 className="Title">Basic Attendance Management Application</h1>
+    
+    <div className="FormContainer">
       <div className="StudentForm">
-        <label>Name :</label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-        <label>Roll Number :</label>
-        <input type="number" value={rollnumber} onChange={(e) => setRollnumber(Number(e.target.value))} />
+        <label htmlFor="name">Name :</label>
+        <input 
+          type="text" 
+          id="name"
+          value={name} 
+          onChange={(e) => setName(e.target.value)} 
+        />
+        
+        <label htmlFor="rollnumber">Roll Number :</label>
+        <input 
+          type="number" 
+          id="rollnumber"
+          value={rollnumber} 
+          onChange={(e) => setRollnumber(Number(e.target.value))} 
+        />
+        
         <button onClick={addToList}>Add to List</button>
       </div>
 
-      <StudentList
-        studentList={studentList}
-        attendanceData={attendanceData}
-        handleAttendanceChange={handleAttendanceChange}
-      />
-      <div className="ButtonContainer">
-        <button className="UpdateButton" onClick={handleUpdateAttendance}>
-          Update
-        </button>
-        <button className="DownloadButton" onClick={handleDownloadAttendance}>
-          Download Attendance
-        </button>
+      <div className="DateForm">
+        <label htmlFor="startDate">Start Date :</label>
+        <input 
+          type="date" 
+          id="startDate"
+          value={startDate} 
+          onChange={(e) => setStartDate(e.target.value)} 
+        />
+        
+        <label htmlFor="endDate">End Date :</label>
+        <input 
+          type="date" 
+          id="endDate"
+          value={endDate} 
+          onChange={(e) => setEndDate(e.target.value)} 
+        />
       </div>
-      <ToastContainer />
     </div>
+
+    <StudentList
+      studentList={studentList}
+      attendanceData={attendanceData}
+      handleAttendanceChange={handleAttendanceChange}
+    />
+    
+    <div className="ButtonContainer">
+      <button className="UpdateButton" onClick={handleUpdateAttendance}>
+        Update
+      </button>
+      <button className="DownloadButton" onClick={handleDownloadAttendance}>
+        Download Attendance
+      </button>
+    </div>
+    
+    <ToastContainer />
+  </div>
   );
 }
 
